@@ -53,6 +53,10 @@ class Tokenizer {
         this.position++
     }
     
+    getToken(){
+        return this.tokens
+    }
+    
 }
 
 class Parser {
@@ -74,11 +78,8 @@ class Parser {
     
     parse(){
         return {
-            type: 'Program',
-            body: [{
-                type: 'ExpressionStatement',
-                expression: this.expression()
-            }]
+            type: 'ExpressionStatement',
+            expression: this.expression()
         }
     }
     
@@ -109,5 +110,10 @@ class Parser {
     
 }
 
-let str = '( 2 + 5) * 2'
-console.log( JSON.stringify( new Parser( new Tokenizer( str ).tokens ).parse() ) )
+let str = '( 2 + 5) * 2\n2 + 4'
+let lines = str.split( /\n+/ )
+let main = { type: 'Program', body: [] }
+for( let i=0; i<lines.length; i++ )
+    main.body.push( new Parser( new Tokenizer( str ).getToken() ).parse() )
+
+console.log( JSON.stringify( main ) )
