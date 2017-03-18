@@ -1,130 +1,95 @@
-const str = '123.4 * ((1 - 5) / 4)'
+const isDigit = n => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1][n]
 
-const evaluate = tree => {
+class Source {
     
-    if( tree[0] === 'lit' ){
-        return Number( tree[1] ) 
-    } else {
-        let left  = evaluate( tree[1][0] )
-        let right = evaluate( tree[1][1] )
-        if( tree[0] === '+' ) return left + right
-        else if( tree[0] === '-' ) return left - right
-        else if( tree[0] === '*' ) return left * right
-        else if( tree[0] === '/' ) return left / right
+    constructor( str ){
+        this.str = str
+        this.pos = 0
+    }
+    
+    peek(){
+        if( this.pos < this.str.length )
+            return this.str.charAt( this.pos )
+        return -1
+    }
+    
+    next(){
+        this.pos++
     }
     
 }
 
-const parse = str => {
+class Parser extends Source {
     
-    const statements = {
-        number: /[0-9|.]/,
-        operator: /[+|\-|*|\/|\%]/,
-        space: /\s+/,
-        brackets: {
-            start: /\(/,
-            end: /\)/
-        }
-    }
-    const isMatch = ( value, exp ) => value.match( RegExp( exp ) ) !== null
-    
-    const middle = ( str, position, parsed, stack ) => {
-        
-        if( str[position] === undefined ){
-            if( stack !== '' ){
-                parsed.push( ['lit', stack] )
-                stack = ''
-            }
-            return parsed
-        }
-        
-        if( isMatch( str[position], statements.operator ) ){
-            if( stack !== '' ){
-                parsed.push( ['lit', stack] )
-            }
-            parsed.push( ['operator', str[position]] )
-            stack = ''
-        } else if( isMatch( str[position], statements.number ) ){
-            stack = stack + str[position]
-        } else if( isMatch( str[position], statements.brackets.start ) ){
-            let statement_in_brackets = str.slice( position + 1 )
-            let brackets = middle( statement_in_brackets, 0, [], '' )
-            position = position + brackets[1] + 1
-            parsed.push( ['brackets', brackets[0]] )
-        } else if( isMatch( str[position], statements.brackets.end ) ){
-            parsed.push( ['lit', stack] )
-            stack = ''
-            return [parsed, position]
-        } else if( isMatch( str[position], statements.space ) ){
-            'Skip'
-        } else {
-            console.log( 'Unknown statements : ' + str[position] )
-            return []
-        }
-        
-        return middle( str, position + 1, parsed, stack )
-        
+    constructor( str ){
+        super( str )
     }
     
-    const tree = middle => {
-        
-        let position = 0
-        
-        // Brackets
-        while( true ){
-            if( middle[position] === undefined ){
-                break
-            }
-            
-            if( middle[position][0] === 'brackets' ){
-                middle[position] = tree( middle[position][1] )
-            }
-
-            position = position + 1
+    number(){
+        let sb = ''
+        let ch
+        while( ( ch = this.peek() ) >= 0 && isDigit( ch ) ){
+            sb += String( ch )
+            this.next()
         }
-        
-        position = 0
-        
-        // Operator
-        while( true ){
-            if( middle[position] === undefined ){
-                break
-            }
-            
-            if( middle[position][0] === 'operator' && ( middle[position][1] === '*' || middle[position][1] === '/' ) ){
-                middle = middle.concat().splice( 0, position - 1 )
-                    .concat( [[middle[position][1], [ middle[position - 1], middle[position + 1]]]] )
-                    .concat( middle.splice( position + 2 ) )
-            } else {
-                position = position + 1
-            }
-        }
-        
-        position = 0
-        
-        while( true ){
-            if( middle[position] === undefined ){
-                break
-            }
-
-            if( middle[position][0] === 'operator' ){
-                middle = middle.concat().splice( 0, position - 1 )
-                    .concat( [[middle[position][1], [ middle[position - 1], middle[position + 1]]]] )
-                    .concat( middle.splice( position + 2 ) )
-            } else {
-                position = position + 1
-            }
-        }
-        
-        return middle[0]
-        
+        return Number( sb.toString() )
     }
     
-    return tree( middle( str, 0, [], '' ) )
+    expr(){
+        let x = this.term()
+        for( ;; ){
+            switch( this.peek() ){
+                case '+' :
+                    this.next()
+                    x += this.term()
+                    continue
+                case '-' :
+                    this.next()
+                    x -= this.term()
+                    continue
+            }
+            break
+        }
+        return x
+    }
+    
+    term(){
+        let x = this.factor()
+        for( ;; ){
+            switch( this.peek() ){
+                case '*' :
+                    this.next()
+                    x *= this.factor()
+                    continue
+                case '/' :
+                    this.next()
+                    x /= this.factor()
+                    continue
+            }
+            break
+        }
+        return x
+    }
+    
+    factor(){
+        let ret
+        this.spaces()
+        if( this.peek() === '(' ){
+            this.next()
+            ret = this.expr()
+            if( this.peek() === ')' )
+                this.next()
+        } else
+            ret = this.number()
+        this.spaces()
+        return ret
+    }
+    
+    spaces(){
+        while( this.peek() === ' ' )
+            this.next()
+    }
     
 }
 
-const tree = parse( str )
-const result = evaluate( tree )
-
-console.log( result )
+console.log( new Parser("( 2    +3) * 4  ").expr() )
