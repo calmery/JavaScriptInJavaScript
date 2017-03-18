@@ -5,8 +5,10 @@ const Tokenizer = calc_ast.Tokenizer,
 
 const dump = JSON.stringify
 
-let str = 'abc =2\n2 + abc'
-let lines = str.split( /\n+/ )
+const fs = require( 'fs' )
+const load = path => fs.readFileSync( './formula', 'utf-8' )
+
+let lines = load( './formula' ).split( /\n+/ )
 let main = { type: 'Program', body: [] }
 for( let i=0; i<lines.length; i++ )
     main.body.push( new Parser( new Tokenizer( lines[i] ).getToken() ).parse() )
