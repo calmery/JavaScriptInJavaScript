@@ -148,13 +148,16 @@ class Parser {
             this.poll()
             return n
         } else {
-            return new Literal( this.poll() )
+            if( this.peek().match( RegExp( token.variable ) ) )
+                return new Identifier( this.poll() )
+            else
+                return new Literal( this.poll() )
         }
     }
     
 }
 
-let str = 'abc = ( 2 + 5) * 2\n2 + 4123'
+let str = 'abc =2\n2 + abc'
 let lines = str.split( /\n+/ )
 let main = { type: 'Program', body: [] }
 for( let i=0; i<lines.length; i++ )
