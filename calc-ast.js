@@ -26,16 +26,26 @@ class Tokenizer {
         this.tokens = []
         this.position = 0
         
+        const token = {
+            operator: /\+|\-|\*|\//,
+            space: /\s+/,
+            bracket: /[\(|\)]/
+        }
+        
         let str = '', ch
         const isDigit = n => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1][n]
         for( let i=0; i<this.formula.length; i++ ){
             if( ch = this.peek() ){
-                if( isDigit( ch ) ){
-                    str += ch
-                } else {
+                if( ch.match( RegExp( token.space ) ) ){
+                    this.next()
+                    continue
+                }
+                if( ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) ){
                     if( str.length ) this.tokens.push( str )
-                    if( ch !== ' ' ) this.tokens.push( ch )
                     str = ''
+                    this.tokens.push( ch )
+                } else {
+                    str += ch
                 }
             }
             this.next()
@@ -110,10 +120,10 @@ class Parser {
     
 }
 
-let str = '( 2 + 5) * 2\n2 + 4'
+let str = '( 2 + 5) * 2\n2 + 4123'
 let lines = str.split( /\n+/ )
 let main = { type: 'Program', body: [] }
 for( let i=0; i<lines.length; i++ )
-    main.body.push( new Parser( new Tokenizer( str ).getToken() ).parse() )
+    main.body.push( new Parser( new Tokenizer( lines[i] ).getToken() ).parse() )
 
 console.log( JSON.stringify( main ) )
