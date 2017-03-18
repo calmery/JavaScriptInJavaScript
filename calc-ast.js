@@ -19,6 +19,42 @@ class BinaryExpression {
     
 }
 
+class Tokenizer {
+    
+    constructor( formula ){
+        this.formula  = formula
+        this.tokens = []
+        this.position = 0
+        
+        let str = '', ch
+        const isDigit = n => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1][n]
+        for( let i=0; i<this.formula.length; i++ ){
+            if( ch = this.peek() ){
+                if( isDigit( ch ) ){
+                    str += ch
+                } else {
+                    if( str.length ) this.tokens.push( str )
+                    if( ch !== ' ' ) this.tokens.push( ch )
+                    str = ''
+                }
+            }
+            this.next()
+        }
+        if( str.length ) this.tokens.push( str )
+    }
+    
+    peek(){
+        if( this.position < this.formula.length )
+            return this.formula.charAt( this.position )
+        return false
+    }
+    
+    next(){
+        this.position++
+    }
+    
+}
+
 class Parser {
     
     constructor( tokens ){
@@ -73,6 +109,5 @@ class Parser {
     
 }
 
-let str = '( 2 + 5 ) * 2'
-let p = new Parser( str.split( ' ' ) )
-console.log( JSON.stringify( p.parse() ) )
+let str = '( 2 + 5) * 2'
+console.log( JSON.stringify( new Parser( new Tokenizer( str ).tokens ).parse() ) )
