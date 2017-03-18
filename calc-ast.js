@@ -1,50 +1,10 @@
-class Literal {
-    
-    constructor( value ){
-        this.type  = 'Literal'
-        this.value = Number( value )
-        this.raw   = value
-    }
-    
-}
+const types = require( './type' )
+const token = require( './token' )
 
-class Identifier {
-    
-    constructor( name ){
-        this.type = 'Identifier'
-        this.name = name
-    }
-    
-}
-
-class AssignmentExpression {
-    
-    constructor( left, right ){
-        this.type  = '='
-        this.left  = left
-        this.right = right
-    }
-    
-}
-
-class BinaryExpression {
-    
-    constructor( operator, left, right ){
-        this.type     = 'BinaryExpression'
-        this.operator = operator
-        this.left     = left
-        this.right    = right
-    }
-    
-}
-
-const token = {
-    operator: /\+|\-|\*|\//,
-    space: /\s+/,
-    bracket: /[\(|\)]/,
-    bondage: /\=/,
-    variable: /[a-z|A-Z|_|$][a-z|A-Z|0-9|_|$]+/
-}
+const Literal              = types.Literal,
+      Identifier           = types.Identifier,
+      AssignmentExpression = types.AssignmentExpression,
+      BinaryExpression     = types.BinaryExpression
 
 class Tokenizer {
     
@@ -157,10 +117,7 @@ class Parser {
     
 }
 
-let str = 'abc =2\n2 + abc'
-let lines = str.split( /\n+/ )
-let main = { type: 'Program', body: [] }
-for( let i=0; i<lines.length; i++ )
-    main.body.push( new Parser( new Tokenizer( lines[i] ).getToken() ).parse() )
-
-console.log( JSON.stringify( main ) )
+module.exports = {
+    Tokenizer: Tokenizer,
+    Parser   : Parser
+}
