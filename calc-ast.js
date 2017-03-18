@@ -8,6 +8,25 @@ class Literal {
     
 }
 
+class Identifier {
+    
+    constructor( name ){
+        this.type = 'Identifier'
+        this.name = name
+    }
+    
+}
+
+class AssignmentExpression {
+    
+    constructor( left, right ){
+        this.type  = '='
+        this.left  = left
+        this.right = right
+    }
+    
+}
+
 class BinaryExpression {
     
     constructor( operator, left, right ){
@@ -19,18 +38,20 @@ class BinaryExpression {
     
 }
 
+const token = {
+    operator: /\+|\-|\*|\//,
+    space: /\s+/,
+    bracket: /[\(|\)]/,
+    bondage: /\=/,
+    variable: /[a-z|A-Z|_|$][a-z|A-Z|0-9|_|$]+/
+}
+
 class Tokenizer {
     
     constructor( formula ){
         this.formula  = formula
         this.tokens = []
         this.position = 0
-        
-        const token = {
-            operator: /\+|\-|\*|\//,
-            space: /\s+/,
-            bracket: /[\(|\)]/
-        }
         
         let str = '', ch
         const isDigit = n => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1][n]
@@ -40,7 +61,7 @@ class Tokenizer {
                     this.next()
                     continue
                 }
-                if( ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) ){
+                if( ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.bondage ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch )
@@ -89,8 +110,21 @@ class Parser {
     parse(){
         return {
             type: 'ExpressionStatement',
-            expression: this.expression()
+            expression: this.bondage()
         }
+    }
+    
+    bondage(){
+        let n
+        if( this.peek().match( token.variable ) )
+            n = new Identifier( this.poll() )
+        else
+            n = this.expression()
+        while( ( this.peek() === '=' ) ){
+            this.poll()
+            n = new AssignmentExpression( n, this.bondage() )
+        }
+        return n
     }
     
     expression(){
@@ -120,7 +154,7 @@ class Parser {
     
 }
 
-let str = '( 2 + 5) * 2\n2 + 4123'
+let str = 'abc = ( 2 + 5) * 2\n2 + 4123'
 let lines = str.split( /\n+/ )
 let main = { type: 'Program', body: [] }
 for( let i=0; i<lines.length; i++ )
