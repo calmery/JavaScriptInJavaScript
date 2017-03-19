@@ -1,10 +1,1 @@
-if(abc == 5 ){
-abc = 1;
-if(xyz == 10 ){
-xyz = 1;
-} else {
-xyz = 2;
-}
-} else {
-abc = 2;
-}
+f( abc + 3 / 2, 45 );

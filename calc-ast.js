@@ -7,7 +7,9 @@ const Literal              = types.Literal,
       BinaryExpression     = types.BinaryExpression,
       LogicalExpression    = types.LogicalExpression,
       IfStatement          = types.IfStatement,
-      BlockStatement       = types.BlockStatement
+      BlockStatement       = types.BlockStatement,
+      FunctionDeclaration  = types.FunctionDeclaration,
+      CallExpression       = types.CallExpression
 
 class Tokenizer {
     
@@ -26,7 +28,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) ){
+                if( ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) || ( ch === 'f' && this.nextPeek() === 'n' ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch + this.nextPeek() )
@@ -45,7 +47,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) ){
+                if( ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) || ch.match( RegExp( token.comma ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch )
@@ -108,7 +110,7 @@ class Parser {
         let body = [], ret
         while( this.peek() ){
             ret = this.ifstatement()
-            if( ret.type === 'IfStatement' ){
+            if( ret.type === 'IfStatement' || ret.type === 'FunctionDeclaration' ){
                 body.push( ret )
             } else {
                 body.push( {
@@ -130,13 +132,32 @@ class Parser {
             let test = this.bondage()
             this.poll() // )
             this.poll() // {
-            let consequent = new BlockStatement( this.parse() )
+            let consequent
+            if( this.peek() === '}' ) consequent = new BlockStatement( [] )
+            else consequent = new BlockStatement( this.parse() )
             this.poll() // }
             this.poll() // else
             this.poll() // {
-            let alternate = new BlockStatement( this.parse() )
+            let alternate 
+            if( this.peek() === '}' ) alternate = new BlockStatement( [] )
+            else alternate = new BlockStatement( this.parse() )
             this.poll() // }
             n = new IfStatement( test, consequent, alternate )
+        } else if( this.peek() === 'fn' ) {
+            this.poll() // fn
+            let id = new Identifier( this.poll() )
+            this.poll() // (
+            let params = []
+            while( this.peek() !== ')' ){
+                params.push( new Identifier( this.poll() ) )
+            }
+            this.poll() // )
+            this.poll() // {
+            let body
+            if( this.peek() === '}' ) body = []
+            else body = new BlockStatement( this.parse() )
+            this.poll() // }
+            n = new FunctionDeclaration( id, params, body )
         } else {
             n = this.bondage()
         }
@@ -190,7 +211,22 @@ class Parser {
             return n
         } else {
             if( this.peek().match( RegExp( token.variable ) ) ){
-                return new Identifier( this.poll() )
+                if( this.nextPeek() === '(' ){
+                    
+                    let id = new Identifier( this.poll() )
+                    this.poll() // (
+                    let params = []
+                    while( this.peek() !== ')' ){
+                        if( this.peek() === ',' ){
+                            this.poll()
+                            continue
+                        }
+                        params.push( this.bondage() )
+                    }
+                    this.poll() // )
+                    return new CallExpression( id, params )
+                    
+                } else return new Identifier( this.poll() )
             } else
                 return new Literal( this.poll() )
         }

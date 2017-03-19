@@ -56,6 +56,23 @@ class BlockStatement {
     }
 }
 
+class FunctionDeclaration {
+    constructor( id, params, body ){
+        this.type   = 'FunctionDeclaration'
+        this.id     = id
+        this.params = params
+        this.body   = body
+    }
+}
+
+class CallExpression {
+    constructor( callee, args ){
+        this.type      = 'CallExpression'
+        this.callee    = callee
+        this.arguments = args
+    }
+}
+
 module.exports = {
     Literal             : Literal,
     Identifier          : Identifier,
@@ -63,5 +80,7 @@ module.exports = {
     BinaryExpression    : BinaryExpression,
     LogicalExpression   : LogicalExpression,
     IfStatement         : IfStatement,
-    BlockStatement      : BlockStatement
+    BlockStatement      : BlockStatement,
+    FunctionDeclaration : FunctionDeclaration,
+    CallExpression      : CallExpression
 }
