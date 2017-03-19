@@ -15,9 +15,10 @@ class Identifier {
 
 class AssignmentExpression {
     constructor( left, right ){
-        this.type  = '='
-        this.left  = left
-        this.right = right
+        this.type     = 'AssignmentExpression'
+        this.operator = '='
+        this.left     = left
+        this.right    = right
     }
 }
 

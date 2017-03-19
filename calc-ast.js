@@ -36,15 +36,16 @@ class Tokenizer {
                 }
                 
                 // Newline
+                
                 if( ch.match( RegExp( token.newline ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
-                    this.tokens.push( '\n' )
+                    // this.tokens.push( '\n' )
                     this.next()
                     continue
                 }
                 
-                if( ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) ){
+                if( ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch )
@@ -104,15 +105,42 @@ class Parser {
     }
     
     parse(){
-        let body = []
+        let body = [], ret
         while( this.peek() ){
-            body.push( {
-                type: 'ExpressionStatement',
-                expression: this.bondage()
-            } )
-            if( this.peek() === '\n' ) this.poll()
+            ret = this.ifstatement()
+            if( ret.type === 'IfStatement' ){
+                body.push( ret )
+            } else {
+                body.push( {
+                    type: 'ExpressionStatement',
+                    expression: ret
+                } )
+            }
+            if( this.peek() === ';' ) this.poll()
+            if( this.peek() === '}' ) break
         }
         return body
+    }
+    
+    ifstatement(){
+        let n
+        if( this.peek() === 'if' ){
+            this.poll() // if
+            this.poll() // (
+            let test = this.bondage()
+            this.poll() // )
+            this.poll() // {
+            let consequent = new BlockStatement( this.parse() )
+            this.poll() // }
+            this.poll() // else
+            this.poll() // {
+            let alternate = new BlockStatement( this.parse() )
+            this.poll() // }
+            n = new IfStatement( test, consequent, alternate )
+        } else {
+            n = this.bondage()
+        }
+        return n
     }
     
     bondage(){
@@ -127,9 +155,7 @@ class Parser {
     compareFirst(){
         let n = this.compare()
         while( ( this.peek() === '||' ) || ( this.peek() === '&&' ) ){
-            console.log( this.peek() )
             n = new LogicalExpression( this.poll(), n, this.compareFirst() )
-            console.log( n )
         }
         return n
     }
@@ -150,8 +176,9 @@ class Parser {
     
     term(){
         let n = this.factor()
-        while( ( this.peek() === '*' ) || ( this.peek() === '/' ) )
+        while( ( this.peek() === '*' ) || ( this.peek() === '/' ) ){
             n = new BinaryExpression( this.poll(), n, this.factor() )
+        }
         return n
     }
     
