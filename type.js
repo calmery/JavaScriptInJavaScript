@@ -51,7 +51,7 @@ class IfStatement {
 class BlockStatement {
     constructor( body ){
         this.type = 'BlockStatement'
-        this.body = []
+        this.body = body
     }
 }
 
