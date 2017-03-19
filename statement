@@ -1,2 +1,2 @@
-abc = 2
-2 + abc
+abc = 123
+xyz = 12 + abc
