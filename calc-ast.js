@@ -55,6 +55,7 @@ class Tokenizer {
             this.next()
         }
         if( str.length ) this.tokens.push( str )
+        console.log( JSON.stringify( this.tokens ) )
     }
     
     peek(){
@@ -103,19 +104,19 @@ class Parser {
     }
     
     parse(){
-        return {
-            type: 'ExpressionStatement',
-            expression: this.bondage()
+        let body = []
+        while( this.peek() ){
+            body.push( {
+                type: 'ExpressionStatement',
+                expression: this.bondage()
+            } )
+            if( this.peek() === '\n' ) this.poll()
         }
+        return body
     }
     
     bondage(){
-        let n
-        if( this.peek().match( token.variable ) ){
-            n = new Identifier( this.poll() )
-        } else {
-            n = this.compareFirst()
-        }
+        let n = this.compareFirst()
         while( ( this.peek() === '=' ) ){
             this.poll()
             n = new AssignmentExpression( n, this.bondage() )
@@ -157,13 +158,13 @@ class Parser {
     factor(){
         if( ( this.peek() === '(' ) ){
             this.poll()
-            let n = this.expression()
+            let n = this.bondage()
             this.poll()
             return n
         } else {
-            if( this.peek().match( RegExp( token.variable ) ) )
+            if( this.peek().match( RegExp( token.variable ) ) ){
                 return new Identifier( this.poll() )
-            else
+            } else
                 return new Literal( this.poll() )
         }
     }

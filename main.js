@@ -8,9 +8,8 @@ const dump = JSON.stringify
 const fs = require( 'fs' )
 const load = path => fs.readFileSync( path, 'utf-8' )
 
-let lines = load( './statement' ).split( /\n+/ )
-let main = { type: 'Program', body: [] }
-for( let i=0; i<lines.length; i++ )
-    main.body.push( new Parser( new Tokenizer( lines[i] ).getToken() ).parse() )
+let lines = load( './statement' )
+let main = { type: 'Program' }
+main.body = new Parser( new Tokenizer( lines ).getToken() ).parse()
 
 console.log( dump( main ) )
