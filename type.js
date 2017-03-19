@@ -73,6 +73,13 @@ class CallExpression {
     }
 }
 
+class ReturnStatement {
+    constructor( args ){
+        this.type = 'ReturnStatement'
+        this.argument = args
+    }
+}
+
 module.exports = {
     Literal             : Literal,
     Identifier          : Identifier,
@@ -82,5 +89,6 @@ module.exports = {
     IfStatement         : IfStatement,
     BlockStatement      : BlockStatement,
     FunctionDeclaration : FunctionDeclaration,
-    CallExpression      : CallExpression
+    CallExpression      : CallExpression,
+    ReturnStatement     : ReturnStatement
 }

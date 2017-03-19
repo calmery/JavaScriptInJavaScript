@@ -9,7 +9,8 @@ const Literal              = types.Literal,
       IfStatement          = types.IfStatement,
       BlockStatement       = types.BlockStatement,
       FunctionDeclaration  = types.FunctionDeclaration,
-      CallExpression       = types.CallExpression
+      CallExpression       = types.CallExpression,
+      ReturnStatement      = types.ReturnStatement
 
 class Tokenizer {
     
@@ -24,6 +25,19 @@ class Tokenizer {
             if( ch = this.peek() ){
                 
                 if( ch.match( RegExp( token.newline ) ) === null && ch.match( RegExp( token.space ) ) ){
+                    this.next()
+                    continue
+                }
+                
+                if( ch === 'r' && this.nextPeek() === 'e' && this.formula[this.position+2] === 't' && this.formula[this.position+3] === 'u' && this.formula[this.position+4] === 'r' && this.formula[this.position+5] === 'n' ){
+                    if( str.length ) this.tokens.push( str )
+                    str = ''
+                    this.tokens.push( 'return' )
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
                     this.next()
                     continue
                 }
@@ -110,7 +124,7 @@ class Parser {
         let body = [], ret
         while( this.peek() ){
             ret = this.ifstatement()
-            if( ret.type === 'IfStatement' || ret.type === 'FunctionDeclaration' ){
+            if( ret.type === 'IfStatement' || ret.type === 'FunctionDeclaration' || ret.type === 'ReturnStatement' ){
                 body.push( ret )
             } else {
                 body.push( {
@@ -226,6 +240,9 @@ class Parser {
                     this.poll() // )
                     return new CallExpression( id, params )
                     
+                } else if( this.peek() === 'return' ) {
+                    this.poll()
+                    return new ReturnStatement( this.bondage() )
                 } else return new Identifier( this.poll() )
             } else
                 return new Literal( this.poll() )

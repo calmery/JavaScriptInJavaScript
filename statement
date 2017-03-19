@@ -1,1 +1,5 @@
-f( abc + 3 / 2, 45 );
+fn abc(){
+    abc = 5
+    xyz = abc + 10
+    return xyz - 10
+}
