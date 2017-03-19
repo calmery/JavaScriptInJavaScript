@@ -6,7 +6,7 @@ const Tokenizer = calc_ast.Tokenizer,
 const dump = JSON.stringify
 
 const fs = require( 'fs' )
-const load = path => fs.readFileSync( './formula', 'utf-8' )
+const load = path => fs.readFileSync( path, 'utf-8' )
 
 let lines = load( './statement' ).split( /\n+/ )
 let main = { type: 'Program', body: [] }
