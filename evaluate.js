@@ -4,11 +4,11 @@ const evaluate = ( tree, lenv, genv ) => {
         let last
         for( let i=0; i<tree.body.length; i++ ){
             if( tree.body[i].type === 'ReturnStatement' ){
-                return tree.body[i]
+                return { type: 'ReturnStatement', value: evaluate( tree.body[i], lenv, genv ) }
             }
             last = evaluate( tree.body[i], lenv, genv )
             if( last.type === 'ReturnStatement' ){
-                return evaluate( last, lenv, genv )
+                return last.value
             }
         }
         return last
@@ -74,7 +74,11 @@ const evaluate = ( tree, lenv, genv ) => {
             for( let i=0; i<fn.params.length; i++ ){
                 new_lenv[fn.params[i].name] = arg[i]
             }
-            return evaluate( fn.body, new_lenv, genv )
+            let ret = evaluate( fn.body, new_lenv, genv )
+            if( ret !== undefined && ret.type === 'ReturnStatement' ){
+                ret = ret.value
+            }
+            return ret
         }
     }
     
