@@ -84,6 +84,13 @@ class ReturnStatement {
     }
 }
 
+class ArrayExpression {
+    constructor( elements ){
+        this.type     = 'ArrayExpression'
+        this.elements = elements
+    }
+}
+
 module.exports = {
     Literal             : Literal,
     Identifier          : Identifier,
@@ -94,5 +101,6 @@ module.exports = {
     BlockStatement      : BlockStatement,
     FunctionDeclaration : FunctionDeclaration,
     CallExpression      : CallExpression,
-    ReturnStatement     : ReturnStatement
+    ReturnStatement     : ReturnStatement,
+    ArrayExpression     : ArrayExpression
 }

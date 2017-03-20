@@ -10,7 +10,8 @@ const Literal              = types.Literal,
       BlockStatement       = types.BlockStatement,
       FunctionDeclaration  = types.FunctionDeclaration,
       CallExpression       = types.CallExpression,
-      ReturnStatement      = types.ReturnStatement
+      ReturnStatement      = types.ReturnStatement,
+      ArrayExpression      = types.ArrayExpression
 
 class Tokenizer {
     
@@ -258,7 +259,26 @@ class Parser {
     }
     
     factor(){
-        if( ( this.peek() === '(' ) ){
+        if( this.peek() === '[' ){
+            
+            let elem = []
+            
+            this.poll() // [
+            while( true ){
+                elem.push( this.bondage() )
+                if( this.peek() === ',' ){
+                    this.poll()
+                }
+                if( this.peek() === ']' ){
+                    break
+                }
+            }
+            this.poll() // ]
+            
+            let ar = new ArrayExpression( elem )
+            return ar
+            
+        } else if( ( this.peek() === '(' ) ){
             this.poll()
             let n = this.bondage()
             this.poll()
