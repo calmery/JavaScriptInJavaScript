@@ -39,18 +39,17 @@ class Tokenizer {
                     this.next() // '
                     while( true ){
                         s += this.peek()
+                        if( this.nextPeek() === '\'' ){
+                            // Escape
+                            if( this.peek() === '\\' ){
+                                this.next()
+                                s += '\''
+                            } else {
+                                this.next()
+                                break
+                            }
+                        }
                         this.next()
-                        // Escape
-                        if( this.peek() === '\\' && this.nextPeek() === '\'' ){
-                            s += '\''
-                            this.next()
-                            this.next()
-                        }
-                        if( this.peek() !== '\\' && this.nextPeek() === '\'' ){
-                            s += this.peek()
-                            this.next()
-                            break
-                        }
                     }
                     this.next() // '
                     this.tokens.push( '\'' + s + '\'' )
@@ -288,6 +287,8 @@ class Parser {
             this.poll()
             return n
         } else if( ( this.peek() === '{' ) ){
+            
+            // hash table
             
             this.poll() // {
             
