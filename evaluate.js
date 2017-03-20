@@ -21,9 +21,20 @@ const evaluate = ( tree, lenv, genv ) => {
         let elements = tree.elements
         let arr = []
         for( let i=0; i<elements.length; i++ ){
-            arr.push( evaluate( elements[i], lenv, genv ) )
+            arr.push( elements[i] )
         }
         return arr
+    }
+    
+    if( tree.type === 'ObjectExpression' ){
+        let properties = tree.properties
+        let hash = {}
+        for( let i=0; i<properties.length; i++ ){
+            let key = properties[i].key.name
+            let value = properties[i].value
+            hash[key] = value
+        }
+        return hash
     }
     
     if( tree.type === 'MemberExpression' ){
@@ -31,7 +42,7 @@ const evaluate = ( tree, lenv, genv ) => {
         if( tree.property.type === 'MemberExpression' ){
             tree.property = { value: evaluate( tree.property, lenv, genv ) }
         }
-        return lenv[name][tree.property.value]
+        return evaluate( lenv[name][tree.property.value], lenv, genv )
     }
     
     if( tree.type === 'ReturnStatement' ){
@@ -92,7 +103,9 @@ const evaluate = ( tree, lenv, genv ) => {
         if( tree.operator === '-' )  return left - right
         if( tree.operator === '*' )  return left * right
         if( tree.operator === '/' )  return left / right
+        if( tree.operator === '%' )  return left % right
         if( tree.operator === '==' ) return left == right
+        if( tree.operator === '!=' ) return left != right
     }
     
     if( tree.type === 'FunctionDeclaration' ){
