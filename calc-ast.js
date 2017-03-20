@@ -259,6 +259,7 @@ class Parser {
                     
                 } else if( this.peek() === 'return' ) {
                     this.poll()
+                    // return 直後に () があると関数として認識されてしまう
                     return new ReturnStatement( this.bondage() )
                 } else return new Identifier( this.poll() )
             } else

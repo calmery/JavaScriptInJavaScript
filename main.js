@@ -1,4 +1,5 @@
-const calc_ast = require( './calc-ast' )
+const calc_ast = require( './calc-ast' ),
+      evaluate = require( './evaluate' )
 
 const Tokenizer = calc_ast.Tokenizer,
       Parser    = calc_ast.Parser
@@ -12,4 +13,8 @@ let lines = load( './statement' )
 let main = { type: 'Program' }
 main.body = new Parser( new Tokenizer( lines ).getToken() ).parse()
 
+console.log( '-----' )
 console.log( dump( main ) )
+
+console.log( '-----' )
+evaluate( main, {}, {print: console.log} )

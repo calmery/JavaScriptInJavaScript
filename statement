@@ -1,5 +1,9 @@
-fn abc(){
-    abc = 5
-    xyz = abc + 10
-    return xyz - 10
+function fib( n ){
+    if( n == 0 ){
+        return 1
+    } else {
+        return n * fib( n - 1 )
+    }
 }
+
+print( fib( 4 ) )
