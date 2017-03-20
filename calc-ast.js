@@ -29,6 +29,29 @@ class Tokenizer {
                     continue
                 }
                 
+                // String
+                if( ch === '\'' ){
+                    let s = ''
+                    this.next() // '
+                    while( true ){
+                        s += this.peek()
+                        this.next()
+                        // Escape
+                        if( this.peek() === '\\' && this.nextPeek() === '\'' ){
+                            s += '\''
+                            this.next()
+                            this.next()
+                        }
+                        if( this.peek() !== '\\' && this.nextPeek() === '\'' ){
+                            s += this.peek()
+                            this.next()
+                            break
+                        }
+                    }
+                    this.next() // '
+                    this.tokens.push( '\'' + s + '\'' )
+                }
+                
                 // function
                 if( ch === 'f' && this.nextPeek() === 'u' && this.formula[this.position+2] === 'n' && this.formula[this.position+3] === 'c' && this.formula[this.position+4] === 't' && this.formula[this.position+5] === 'i' && this.formula[this.position+6] === 'o' && this.formula[this.position+7] === 'n' ){
                     if( str.length ) this.tokens.push( str )
@@ -261,7 +284,11 @@ class Parser {
                     this.poll()
                     // return 直後に () があると関数として認識されてしまう
                     return new ReturnStatement( this.bondage() )
-                } else return new Identifier( this.poll() )
+                } else {
+                    if( this.peek()[0] === '\'' && this.peek()[this.peek().length-1] === '\'' ){
+                        return new Literal( this.poll() )
+                    } else return new Identifier( this.poll() )
+                }
             } else
                 return new Literal( this.poll() )
         }

@@ -1,8 +1,12 @@
 class Literal {
     constructor( value ){
         this.type  = 'Literal'
-        this.value = Number( value )
         this.raw   = value
+        if( value.indexOf( '\'' ) !== -1 ){
+            this.value = value.slice( 1, value.length-1 )
+        } else {
+            this.value = Number( value )
+        }
     }
 }
 
