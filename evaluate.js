@@ -3,7 +3,13 @@ const evaluate = ( tree, lenv, genv ) => {
     if( tree.type === 'Program' || tree.type === 'BlockStatement' ){
         let last
         for( let i=0; i<tree.body.length; i++ ){
+            if( tree.body[i].type === 'ReturnStatement' ){
+                return tree.body[i]
+            }
             last = evaluate( tree.body[i], lenv, genv )
+            if( last.type === 'ReturnStatement' ){
+                return evaluate( last, lenv, genv )
+            }
         }
         return last
     }
