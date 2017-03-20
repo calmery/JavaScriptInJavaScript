@@ -7,7 +7,8 @@ const token = {
     braces  : /\{|\}/,
     newline : /\n+/,
     semi    : /\;/,
-    comma   : /\,/
+    comma   : /\,/,
+    array   : /\[|\]/
 }
 
 module.exports = token

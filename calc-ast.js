@@ -100,7 +100,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) || ch.match( RegExp( token.comma ) ) ){
+                if( ch.match( RegExp( token.array ) ) || ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) || ch.match( RegExp( token.comma ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch )
