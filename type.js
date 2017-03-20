@@ -99,6 +99,21 @@ class MemberExpression {
     }
 }
 
+class ObjectExpression {
+    constructor( properties ){
+        this.type       = 'ObjectExpression'
+        this.properties = properties
+    }
+}
+
+class Property {
+    constructor( key, value ){
+        this.type  = 'Property'
+        this.key   = key
+        this.value = value
+    }
+}
+
 // Array like : [e][e][0]
 class SequenceExpression {
     constructor( expressions ){
@@ -120,5 +135,6 @@ module.exports = {
     ReturnStatement     : ReturnStatement,
     ArrayExpression     : ArrayExpression,
     MemberExpression    : MemberExpression,
-    SequenceExpression  : SequenceExpression
+    ObjectExpression    : ObjectExpression,
+    Property            : Property
 }

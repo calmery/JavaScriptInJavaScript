@@ -13,7 +13,8 @@ const Literal              = types.Literal,
       ReturnStatement      = types.ReturnStatement,
       ArrayExpression      = types.ArrayExpression,
       MemberExpression     = types.MemberExpression,
-      SequenceExpression   = types.SequenceExpression
+      ObjectExpression     = types.ObjectExpression,
+      Property             = types.Property
 
 class Tokenizer {
     
@@ -53,6 +54,7 @@ class Tokenizer {
                     }
                     this.next() // '
                     this.tokens.push( '\'' + s + '\'' )
+                    continue
                 }
                 
                 // function
@@ -84,7 +86,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) ){
+                if( ( ch === '!' && this.nextPeek() === '=' ) || ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch + this.nextPeek() )
@@ -103,7 +105,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ch.match( RegExp( token.array ) ) || ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) || ch.match( RegExp( token.comma ) ) ){
+                if( ch.match( RegExp( token.hash ) ) || ch.match( RegExp( token.colon ) ) || ch.match( RegExp( token.array ) ) || ch.match( RegExp( token.bondage ) ) || ch.match( RegExp( token.operator ) ) || ch.match( RegExp( token.bracket ) ) || ch.match( RegExp( token.braces ) ) || ch.match( RegExp( token.semi ) ) || ch.match( RegExp( token.comma ) ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch )
@@ -240,7 +242,7 @@ class Parser {
     
     compare(){
         let n = this.expression()
-        while( ( this.peek() === '==' ) )
+        while( ( this.peek() === '==' ) || ( this.peek() === '!=' ) )
             n = new BinaryExpression( this.poll(), n, this.expression() )
         return n
     }
@@ -254,7 +256,7 @@ class Parser {
     
     term(){
         let n = this.factor()
-        while( ( this.peek() === '*' ) || ( this.peek() === '/' ) ){
+        while( ( this.peek() === '*' ) || ( this.peek() === '/' ) || ( this.peek() === '%' ) ){
             n = new BinaryExpression( this.poll(), n, this.factor() )
         }
         return n
@@ -285,6 +287,29 @@ class Parser {
             let n = this.bondage()
             this.poll()
             return n
+        } else if( ( this.peek() === '{' ) ){
+            
+            this.poll() // {
+            
+            let p = []
+            
+            while( true ){
+                if( this.peek() === ',' ){
+                    this.poll()
+                    continue
+                }
+                let name = this.poll()
+                this.poll() // :
+                let value = this.bondage()
+                p.push( new Property( new Identifier( name ), value ) )
+                if( this.peek() === '}' ){
+                    this.poll()
+                    break
+                }
+            }
+            
+            return new ObjectExpression( p )
+            
         } else {
             if( this.peek().match( RegExp( token.variable ) ) ){
                 if( this.nextPeek() === '(' ){

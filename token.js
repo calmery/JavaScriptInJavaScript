@@ -1,5 +1,5 @@
 const token = {
-    operator: /\+|\-|\*|\//,
+    operator: /\+|\-|\*|\/|\%/,
     space   : /\s+/,
     bracket : /[\(|\)]/,
     bondage : /\=/,
@@ -8,7 +8,9 @@ const token = {
     newline : /\n+/,
     semi    : /\;/,
     comma   : /\,/,
-    array   : /\[|\]/
+    array   : /\[|\]/,
+    colon   : /\:/,
+    hash    : /\{|\}/
 }
 
 module.exports = token
