@@ -17,6 +17,23 @@ const evaluate = ( tree, lenv, genv ) => {
         }
     }
     
+    if( tree.type === 'ArrayExpression' ){
+        let elements = tree.elements
+        let arr = []
+        for( let i=0; i<elements.length; i++ ){
+            arr.push( evaluate( elements[i], lenv, genv ) )
+        }
+        return arr
+    }
+    
+    if( tree.type === 'MemberExpression' ){
+        let name = tree.object.name
+        if( tree.property.type === 'MemberExpression' ){
+            tree.property = { value: evaluate( tree.property, lenv, genv ) }
+        }
+        return lenv[name][tree.property.value]
+    }
+    
     if( tree.type === 'ReturnStatement' ){
         return evaluate( tree.argument, lenv, genv )
     }

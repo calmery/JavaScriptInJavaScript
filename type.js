@@ -99,6 +99,14 @@ class MemberExpression {
     }
 }
 
+// Array like : [e][e][0]
+class SequenceExpression {
+    constructor( expressions ){
+        this.type        = 'SequenceExpression'
+        this.expressions = expressions
+    }
+}
+
 module.exports = {
     Literal             : Literal,
     Identifier          : Identifier,
@@ -111,5 +119,6 @@ module.exports = {
     CallExpression      : CallExpression,
     ReturnStatement     : ReturnStatement,
     ArrayExpression     : ArrayExpression,
-    MemberExpression    : MemberExpression
+    MemberExpression    : MemberExpression,
+    SequenceExpression  : SequenceExpression
 }

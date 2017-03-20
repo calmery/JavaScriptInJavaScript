@@ -12,7 +12,8 @@ const Literal              = types.Literal,
       CallExpression       = types.CallExpression,
       ReturnStatement      = types.ReturnStatement,
       ArrayExpression      = types.ArrayExpression,
-      MemberExpression     = types.MemberExpression
+      MemberExpression     = types.MemberExpression,
+      SequenceExpression   = types.SequenceExpression
 
 class Tokenizer {
     
@@ -275,27 +276,9 @@ class Parser {
                 }
             }
             this.poll() // ]
-            let ar = new ArrayExpression( elem )
+            let arr = new ArrayExpression( elem )
             
-            // Like [e][0]
-            
-            let like = ( () => {
-                
-                if( this.peek() === '[' ){
-                    let object   = new Identifier( this.poll() )
-                    let property = this.bondage()
-                    this.poll() // ]
-                    ar = new MemberExpression( ar, property )
-                    if( this.peek() === '[' ) return like()
-                }
-                
-                return ar
-                
-            } )
-            
-            ar = like()
-            
-            return ar
+            return arr
             
         } else if( ( this.peek() === '(' ) ){
             this.poll()
