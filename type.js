@@ -91,6 +91,14 @@ class ArrayExpression {
     }
 }
 
+class MemberExpression {
+    constructor( object, property ){
+        this.type     = 'MemberExpression'
+        this.object   = object 
+        this.property = property
+    }
+}
+
 module.exports = {
     Literal             : Literal,
     Identifier          : Identifier,
@@ -102,5 +110,6 @@ module.exports = {
     FunctionDeclaration : FunctionDeclaration,
     CallExpression      : CallExpression,
     ReturnStatement     : ReturnStatement,
-    ArrayExpression     : ArrayExpression
+    ArrayExpression     : ArrayExpression,
+    MemberExpression    : MemberExpression
 }
