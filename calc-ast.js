@@ -29,6 +29,22 @@ class Tokenizer {
                     continue
                 }
                 
+                // function
+                if( ch === 'f' && this.nextPeek() === 'u' && this.formula[this.position+2] === 'n' && this.formula[this.position+3] === 'c' && this.formula[this.position+4] === 't' && this.formula[this.position+5] === 'i' && this.formula[this.position+6] === 'o' && this.formula[this.position+7] === 'n' ){
+                    if( str.length ) this.tokens.push( str )
+                    str = ''
+                    this.tokens.push( 'function' )
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    this.next()
+                    continue
+                }
+                
                 if( ch === 'r' && this.nextPeek() === 'e' && this.formula[this.position+2] === 't' && this.formula[this.position+3] === 'u' && this.formula[this.position+4] === 'r' && this.formula[this.position+5] === 'n' ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
@@ -42,7 +58,7 @@ class Tokenizer {
                     continue
                 }
                 
-                if( ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) || ( ch === 'f' && this.nextPeek() === 'n' ) ){
+                if( ( ch === '=' && this.nextPeek() === '=' ) || ( ch === '|' && this.nextPeek() === '|' ) || ( ch === '&' && this.nextPeek() === '&' ) ){
                     if( str.length ) this.tokens.push( str )
                     str = ''
                     this.tokens.push( ch + this.nextPeek() )
@@ -157,13 +173,14 @@ class Parser {
             else alternate = new BlockStatement( this.parse() )
             this.poll() // }
             n = new IfStatement( test, consequent, alternate )
-        } else if( this.peek() === 'fn' ) {
-            this.poll() // fn
+        } else if( this.peek() === 'function' ) {
+            this.poll() // function
             let id = new Identifier( this.poll() )
             this.poll() // (
             let params = []
             while( this.peek() !== ')' ){
-                params.push( new Identifier( this.poll() ) )
+                if( this.peek() !== ',' ) params.push( new Identifier( this.poll() ) )
+                else this.poll()
             }
             this.poll() // )
             this.poll() // {
