@@ -11,7 +11,8 @@ const load = path => fs.readFileSync( path, 'utf-8' )
 
 let lines = load( './statement' )
 let main = { type: 'Program' }
-main.body = new Parser( new Tokenizer( lines ).getToken() ).parse()
+let token = new Tokenizer( lines ).getToken()
+main.body = new Parser( token ).parse()
 
 console.log( '-----' )
 console.log( dump( main ) )
